@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// DATABASE
-const db = new sqlite3.Database("./wedding_data.db");
+// ================= DATABASE =================
+const db = new sqlite3.Database("/tmp/wedding_data.db");
 
 db.serialize(() => {
     db.run(`
@@ -34,9 +34,18 @@ db.serialize(() => {
   `);
 });
 
-// RSVP
+// ================= HEALTH CHECK =================
+app.get("/", (req, res) => {
+    res.send("🔥 Wedding Backend is Running");
+});
+
+// ================= RSVP API =================
 app.post("/api/rsvp", (req, res) => {
     const { name, phone, date, status } = req.body;
+
+    if (!name || !phone) {
+        return res.status(400).json({ error: "Name and phone required" });
+    }
 
     db.run(
         `INSERT INTO rsvps (name, phone, date, status) VALUES (?, ?, ?, ?)`,
@@ -69,7 +78,7 @@ app.post("/api/rsvp/confirm/:id", (req, res) => {
     );
 });
 
-// GAME SCORE
+// ================= GAME API =================
 app.post("/api/game/score", (req, res) => {
     const { username, score } = req.body;
 
@@ -83,7 +92,10 @@ app.post("/api/game/score", (req, res) => {
         function (err) {
             if (err) return res.status(500).json({ error: err.message });
 
-            res.json({ success: true, id: this.lastID });
+            res.json({
+                success: true,
+                id: this.lastID,
+            });
         }
     );
 });
@@ -99,7 +111,7 @@ app.get("/api/game/leaderboard", (req, res) => {
     );
 });
 
-// START
+// ================= START =================
 app.listen(PORT, () => {
     console.log(`🔥 Server running at http://localhost:${PORT}`);
 });
