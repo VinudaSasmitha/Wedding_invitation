@@ -3,16 +3,15 @@ const cors = require("cors");
 const sqlite3 = require("sqlite3").verbose();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// ================= DATABASE =================
+// DATABASE
 const db = new sqlite3.Database("./wedding_data.db");
 
 db.serialize(() => {
-    // RSVP TABLE
     db.run(`
     CREATE TABLE IF NOT EXISTS rsvps (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +24,6 @@ db.serialize(() => {
     )
   `);
 
-    // GAME SCORE TABLE
     db.run(`
     CREATE TABLE IF NOT EXISTS scores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,9 +34,7 @@ db.serialize(() => {
   `);
 });
 
-// ================= RSVP API =================
-
-// Create RSVP
+// RSVP
 app.post("/api/rsvp", (req, res) => {
     const { name, phone, date, status } = req.body;
 
@@ -52,7 +48,6 @@ app.post("/api/rsvp", (req, res) => {
     );
 });
 
-// Get all RSVPs
 app.get("/api/rsvps", (req, res) => {
     db.all(`SELECT * FROM rsvps ORDER BY id DESC`, [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -60,7 +55,6 @@ app.get("/api/rsvps", (req, res) => {
     });
 });
 
-// Confirm RSVP
 app.post("/api/rsvp/confirm/:id", (req, res) => {
     const id = req.params.id;
     const { confirmed } = req.body;
@@ -75,9 +69,7 @@ app.post("/api/rsvp/confirm/:id", (req, res) => {
     );
 });
 
-// ================= GAME API =================
-
-// Save Score
+// GAME SCORE
 app.post("/api/game/score", (req, res) => {
     const { username, score } = req.body;
 
@@ -91,15 +83,11 @@ app.post("/api/game/score", (req, res) => {
         function (err) {
             if (err) return res.status(500).json({ error: err.message });
 
-            res.json({
-                success: true,
-                id: this.lastID,
-            });
+            res.json({ success: true, id: this.lastID });
         }
     );
 });
 
-// Leaderboard (Top 10)
 app.get("/api/game/leaderboard", (req, res) => {
     db.all(
         `SELECT username, score FROM scores ORDER BY score DESC LIMIT 10`,
@@ -111,7 +99,7 @@ app.get("/api/game/leaderboard", (req, res) => {
     );
 });
 
-// ================= START SERVER =================
+// START
 app.listen(PORT, () => {
     console.log(`🔥 Server running at http://localhost:${PORT}`);
 });
