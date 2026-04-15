@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wedding Ninja | Ultimate Hardcore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Poppins:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #2b1018, #0a0305);
+            touch-action: none;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .bangers-font {
+            font-family: 'Bangers', cursive;
+        }
+
+        .slash-text {
+            position: absolute;
+            pointer-events: none;
+            font-size: 28px;
+            font-family: 'Bangers', cursive;
+            color: #FFF;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 50;
+        }
+
+        .combo-text {
+            font-size: 45px;
+            color: #FFD700;
+            text-shadow: 0 0 15px #FFA500, 0 0 30px #FF4500;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.5);
+            }
+        }
+
+        .flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .flash.active {
+            opacity: 1;
+        }
+
+        .flash.red-flash {
+            background: rgba(255, 0, 0, 0.8);
+        }
+
+        .glass-panel {
+            background: rgba(20, 5, 10, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 20, 147, 0.2);
+        }
+
+        .heart-beat {
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        /* Love Meter UI */
+        .meter-bg {
+            width: 150px;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #ff69b4;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff007f, #ff8c00);
+            width: 0%;
+            transition: width 0.2s ease-out;
+        }
+
+        .frenzy-glow {
+            box-shadow: 0 0 20px #ff007f, 0 0 40px #ff8c00;
+            animation: frenzyPulse 0.5s infinite alternate;
+        }
+
+        @keyframes frenzyPulse {
+            from {
+                opacity: 0.8;
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+    </style>
+</head>
+
+<body class="text-white">
+
+    <audio id="sliceSound1" src="slice1.mp3" preload="auto"></audio>
+    <audio id="sliceSound2" src="slice2.mp3" preload="auto"></audio>
+    <audio id="sliceSound3" src="slice3.mp3" preload="auto"></audio>
+    <audio id="bombSound" src="bomb.mp3" preload="auto"></audio>
+    <audio id="bgmSound" src="bgm.mp3" loop preload="auto"></audio>
+
+    <div id="flash" class="flash"></div>
+
+    <div class="fixed top-0 left-0 w-full p-4 flex justify-between items-start z-40 pointer-events-none">
+
+        <div class="flex flex-col gap-3">
+            <div class="glass-panel px-6 py-2 rounded-2xl flex flex-col items-center">
+                <span class="text-pink-400 text-sm uppercase tracking-widest font-bold">Score</span>
+                <span id="scoreDisplay" class="text-4xl text-white bangers-font tracking-wide">0</span>
+                <span class="text-xs text-yellow-300 font-bold mt-1">Best: <span id="highScoreDisplay">0</span></span>
+            </div>
+            <div class="glass-panel px-4 py-2 rounded-2xl flex items-center justify-center gap-2">
+                <span class="text-2xl">💍</span>
+                <span id="ringDisplayText" class="text-2xl font-bold">0</span>
+            </div>
+        </div>
+
+        <div class="glass-panel px-6 py-3 rounded-2xl flex flex-col items-center mt-2">
+            <span class="text-pink-400 text-xs uppercase font-bold mb-1 tracking-wider" id="meterText">Love Meter</span>
+            <div class="meter-bg">
+                <div id="loveMeterFill" class="meter-fill"></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-3 items-end">
+            <div class="flex gap-2">
+                <div class="glass-panel px-4 py-2 rounded-2xl flex flex-col items-center">
+                    <span class="text-pink-400 text-xs uppercase font-bold mb-1">Lives</span>
+                    <div id="livesDisplay" class="text-xl heart-beat">❤️❤️❤️</div>
+                </div>
+                <div class="flex flex-col gap-2 pointer-events-auto">
+                    <button onclick="togglePause()"
+                        class="glass-panel px-3 py-2 rounded-full hover:bg-white/20 transition text-xs font-bold"
+                        id="pauseBtn">⏸</button>
+                    <button onclick="toggleSound()"
+                        class="glass-panel px-3 py-2 rounded-full hover:bg-white/20 transition text-xs font-bold"
+                        id="soundBtn">🔊</button>
+                </div>
+            </div>
+
+            <div class="glass-panel px-4 py-2 rounded-2xl text-center w-full max-w-[150px]">
+                <span class="text-xs text-gray-400 block font-bold">Status</span>
+                <span id="multiplierDisplay" class="text-sm font-bold text-white transition-all">Lvl 1 Blade</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="startScreen"
+        class="fixed inset-0 z-50 flex flex-col items-center justify-start pt-12 bg-black/85 backdrop-blur-lg overflow-y-auto pb-10">
+        <h1
+            class="text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 mb-2 drop-shadow-[0_0_20px_rgba(255,0,0,0.8)] bangers-font text-center px-4">
+            ]Wedding Ninja
+        </h1>
+        <p class="text-sm md:text-base text-gray-300 mb-6 text-center px-6 max-w-lg leading-relaxed">
+            Slice 💖💍. Dodge 💣.<br>
+            <span class="text-red-500 font-bold">WARNING:</span> Missing items deducts -10 pts!<br>
+            Beware of the <span class="text-purple-500 font-bold">Broken Heart 💔</span> (-50 pts trap!)<br>
+            Fill the Love Meter for FRENZY MODE!
+        </p>
+
+        <input type="text" id="playerName" placeholder="Enter Ninja Name"
+            class="w-full max-w-xs px-6 py-3 rounded-full text-black text-center text-lg mb-4 font-bold outline-none border-4 border-red-500 shadow-[0_0_15px_rgba(255,0,0,0.6)]">
+
+        <button onclick="startGame()"
+            class="px-12 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white text-3xl rounded-full shadow-[0_0_30px_rgba(255,0,0,0.8)] hover:scale-105 transition-transform mb-6 bangers-font tracking-wide">PLAY
+            NOW</button>
+
+        <div class="w-full max-w-sm glass-panel p-5 rounded-3xl mb-6 text-center relative overflow-hidden">
+            <h3 class="text-xl text-yellow-400 font-bold mb-2 z-10 relative">⚔️ Forge Blade</h3>
+            <p class="text-xs text-gray-300 mb-4 z-10 relative">Wider blade + Higher base points!</p>
+            <button onclick="upgradeBlade()"
+                class="relative z-10 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-500 text-white font-bold rounded-full hover:scale-105 transition shadow-lg">
+                Upgrade Lvl <span id="nextLvl">2</span> (<span id="upgCost">20</span> 💍)
+            </button>
+        </div>
+
+        <div class="w-full max-w-sm glass-panel p-5 rounded-3xl">
+            <h3 class="text-center text-xl text-yellow-400 mb-3 bangers-font tracking-widest">🏆 Legends</h3>
+            <ul id="leaderboardList" class="space-y-2 text-sm font-bold">
+                <li class="text-center text-gray-400">Loading...</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="gameOverScreen"
+        class="hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-red-950/90 backdrop-blur-lg">
+        <h1
+            class="text-7xl md:text-9xl text-red-500 mb-2 drop-shadow-[0_0_30px_rgba(255,0,0,1)] bangers-font animate-pulse">
+            GAME OVER</h1>
+        <p class="text-xl text-pink-300 mb-8 font-bold">Final Score: <span id="finalScore"
+                class="text-5xl text-white bangers-font tracking-widest">0</span></p>
+        <button onclick="resetToStart()"
+            class="px-10 py-3 bg-white text-red-600 text-2xl font-bold rounded-full hover:bg-gray-200 transition shadow-[0_0_20px_rgba(255,255,255,0.5)]">Main
+            Menu</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const API_URL = "http://localhost:3000/api";
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        document.body.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+        let width, height;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initStars();
+        }
+        window.addEventListener('resize', resize);
+
+        // --- GAME STATE VARIABLES ---
+        let animationId = null;
+        let isPlaying = false;
+        let paused = false;
+        let muted = false;
+
+        let score = 0;
+        let bestScore = parseInt(localStorage.getItem("weddingNinjaHighScore")) || 0;
+        let rings = parseInt(localStorage.getItem("weddingNinjaRings")) || 0;
+        let bladeLevel = parseInt(localStorage.getItem("bladeLevel")) || 1;
+        let lives = 3;
+        let playerName = '';
+
+        let difficultyTimer = 0;
+        let gameSpeed = 1;
+        let spawnRate = 0.035;
+        let scoreMultiplier = 1;
+        let comboCount = 0;
+        let comboTimer = 0;
+
+        let loveMeter = 0;
+        let frenzyActive = false;
+        let bossActive = false;
+        let nextBossScore = 1000;
+
+        let doubleTimeout = null;
+        let freezeTimeout = null;
+        let magnetTimeout = null;
+        let magnetActive = false;
+        let slowGravityActive = false;
+
+        let currentPointer = { x: 0, y: 0 };
+
+        const MAX_ITEMS = 18;
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        const MAX_PARTICLES = isMobile ? 60 : 150;
+
+        let itemPool = [];
+        let items = [];
+        let particles = [];
+        let sparks = [];
+        let trail = [];
+        let stars = [];
+        let isSwiping = false;
+
+        const GOOD_ITEMS = ['💖', '🎂', '💍', '🍾', '💐'];
+        const SAKURA_PARTICLES = ['🌸', '💖', '✨'];
+        const POWERUPS = [
+            { emoji: '❄️', type: 'freeze', color: '#00FFFF' },
+            { emoji: '⭐', type: 'double', color: '#FFD700' },
+            { emoji: '🧲', type: 'magnet', color: '#a855f7' }
+        ];
+
+        document.getElementById('highScoreDisplay').innerText = bestScore;
+        document.getElementById('ringDisplayText').innerText = rings;
+        updateShopUI();
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 40; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2 + 1,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.fillStyle = "rgba(255, 182, 193, 0.4)";
+            stars.forEach(s => {
+                s.y += s.speed;
+                if (s.y > height) {
+                    s.y = 0;
+                    s.x = Math.random() * width;
+                }
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+            });
+        }
+
+        function toggleSound() {
+            muted = !muted;
+            document.getElementById('bgmSound').muted = muted;
+            document.getElementById('soundBtn').innerText = muted ? "🔇" : "🔊";
+        }
+
+        function playSFX(id) {
+            if (muted) return;
+            const sound = document.getElementById(id);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(() => { });
+            }
+        }
+
+        // NEW: Play Random Slice Sounds
+        function playRandomSliceSound() {
+            if (muted) return;
+            const sounds = ['sliceSound1', 'sliceSound2', 'sliceSound3'];
+            const randomSoundId = sounds[Math.floor(Math.random() * sounds.length)];
+            const sound = document.getElementById(randomSoundId);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(() => { });
+            }
+        }
+
+        function playBGM() {
+            const bgm = document.getElementById('bgmSound');
+            if (bgm && !muted) {
+                bgm.play().catch(() => { });
+            }
+        }
+
+        function getUpgradeCost() {
+            return Math.floor(20 * Math.pow(1.5, bladeLevel - 1));
+        }
+
+        function updateShopUI() {
+            document.getElementById('nextLvl').innerText = bladeLevel + 1;
+            document.getElementById('upgCost').innerText = getUpgradeCost();
+            updatePowerupUI();
+        }
+
+        function upgradeBlade() {
+            let cost = getUpgradeCost();
+            if (rings >= cost) {
+                rings -= cost;
+                bladeLevel++;
+                localStorage.setItem("bladeLevel", bladeLevel);
+                localStorage.setItem("weddingNinjaRings", rings);
+
+                document.getElementById('ringDisplayText').innerText = rings;
+                updateShopUI();
+                playRandomSliceSound();
+            } else {
+                alert(`Need ${cost} 💍 to upgrade!`);
+            }
+        }
+
+        function updateLivesUI() {
+            const d = document.getElementById('livesDisplay');
+            if (lives === 3) d.innerText = '❤️❤️❤️';
+            else if (lives === 2) d.innerText = '❤️❤️🖤';
+            else if (lives === 1) d.innerText = '❤️🖤🖤';
+            else d.innerText = '🖤🖤🖤';
+        }
+
+        function updatePowerupUI() {
+            let statuses = [];
+
+            if (frenzyActive) {
+                statuses.push('🔥 FRENZY 🔥');
+            } else {
+                if (scoreMultiplier > 1) statuses.push('2X ⭐');
+                if (slowGravityActive) statuses.push('SLOW ❄️');
+                if (magnetActive) statuses.push('MAGNET 🧲');
+            }
+
+            let display = document.getElementById('multiplierDisplay');
+            if (statuses.length > 0) {
+                display.innerText = statuses.join(' | ');
+                display.classList.add('text-yellow-300', 'animate-pulse');
+                display.classList.remove('text-white');
+            } else {
+                display.innerText = `Lvl ${bladeLevel} Blade`;
+                display.classList.remove('text-yellow-300', 'animate-pulse');
+                display.classList.add('text-white');
+            }
+        }
+
+        function updateLoveMeter(amount) {
+            if (frenzyActive) return;
+
+            loveMeter += amount;
+            if (loveMeter >= 100) {
+                loveMeter = 100;
+                triggerFrenzy();
+            }
+            document.getElementById('loveMeterFill').style.width = `${loveMeter}%`;
+        }
+
+        function triggerFrenzy() {
+            frenzyActive = true;
+            showFloatingText("FRENZY MODE!", width / 2, height / 2, true, "#ff007f");
+
+            document.getElementById('meterText').innerText = "FRENZY ACTIVE!";
+            document.getElementById('meterText').classList.add('frenzy-glow');
+            updatePowerupUI();
+
+            for (let i = 0; i < 12; i++) {
+                items.push(getItem(true));
+            }
+
+            setTimeout(() => {
+                frenzyActive = false;
+                loveMeter = 0;
+                document.getElementById('loveMeterFill').style.width = `0%`;
+                document.getElementById('meterText').innerText = "Love Meter";
+                document.getElementById('meterText').classList.remove('frenzy-glow');
+                updatePowerupUI();
+            }, 6000);
+        }
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            currentPointer = { x: clientX - rect.left, y: clientY - rect.top };
+            return currentPointer;
+        }
+
+        function startSwipe(e) {
+            if (!isPlaying || paused) return;
+            isSwiping = true;
+            trail = [getPos(e)];
+        }
+
+        function moveSwipe(e) {
+            if (!isSwiping || !isPlaying || paused) return;
+            e.preventDefault();
+            trail.push(getPos(e));
+
+            if (trail.length > 15) trail.shift();
+            checkSlices();
+        }
+
+        function endSwipe() {
+            isSwiping = false;
+            setTimeout(() => trail = [], 50);
+        }
+
+        canvas.addEventListener('mousedown', startSwipe);
+        canvas.addEventListener('mousemove', moveSwipe);
+        window.addEventListener('mouseup', endSwipe);
+
+        canvas.addEventListener('touchstart', startSwipe, { passive: false });
+        canvas.addEventListener('touchmove', moveSwipe, { passive: false });
+        window.addEventListener('touchend', endSwipe);
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'p') togglePause();
+        });
+
+        function togglePause() {
+            if (!isPlaying) return;
+            paused = !paused;
+            document.getElementById('pauseBtn').innerText = paused ? "▶" : "⏸";
+
+            const bgm = document.getElementById('bgmSound');
+            if (paused) {
+                bgm.pause();
+            } else if (!muted) {
+                bgm.play().catch(() => { });
+            }
+        }
+
+        function distSq(v, w) {
+            return (v.x - w.x) ** 2 + (v.y - w.y) ** 2;
+        }
+
+        function distToSegmentSquared(p, v, w) {
+            let l2 = distSq(v, w);
+            if (l2 === 0) return distSq(p, v);
+
+            let t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+            t = Math.max(0, Math.min(1, t));
+
+            return distSq(p, { x: v.x + t * (w.x - v.x), y: v.y + t * (w.y - v.y) });
+        }
+
+        function getItem(forceGood = false) {
+            return itemPool.length ? itemPool.pop().init(forceGood) : new Item().init(forceGood);
+        }
+        function releaseItem(item) {
+            itemPool.push(item);
+        }
+
+        class Particle {
+            constructor(x, y, emoji, isHalf = false) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 15;
+                this.vy = (Math.random() - 0.5) * 15 - 5;
+                this.life = 1;
+                this.emoji = emoji;
+                this.isHalf = isHalf;
+                this.rot = 0;
+                this.rotSpeed = (Math.random() - 0.5) * 0.8;
+            }
+            update() {
+                this.x += this.vx * gameSpeed;
+                this.y += this.vy * gameSpeed;
+                this.vy += 0.4 * gameSpeed;
+                this.life -= 0.02 * gameSpeed;
+                this.rot += this.rotSpeed * gameSpeed;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rot);
+                ctx.font = this.isHalf ? "30px sans-serif" : "15px sans-serif";
+                ctx.fillText(this.emoji, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        class Item {
+            init(forceGood) {
+                this.radius = 45;
+                this.x = Math.random() * (width - 100) + 50;
+                this.y = height + this.radius;
+
+                let centerBias = (width / 2 - this.x) * 0.015;
+                this.vx = ((Math.random() - 0.5) * 6 + centerBias);
+                this.vy = -(Math.random() * 8 + 16);
+                this.baseGravity = 0.30;
+
+                this.hp = 1;
+                this.penalized = false;
+
+                let rand = Math.random();
+
+                // NEW LOGIC: Massive increase in bombs for quick game over
+                if (forceGood) {
+                    this.type = 'normal';
+                    this.emoji = GOOD_ITEMS[Math.floor(Math.random() * GOOD_ITEMS.length)];
+                }
+                else if (score >= nextBossScore && !bossActive) {
+                    this.type = 'boss';
+                    this.emoji = '👰🤵';
+                    this.radius = 80;
+                    this.hp = 10;
+                    bossActive = true;
+                    showFloatingText("WARNING: BOSS!", width / 2, height / 2, true, "red");
+                }
+                else if (rand < 0.02) {
+                    this.type = 'gift';
+                    this.emoji = '🎁';
+                }
+                else if (rand < 0.45 && !frenzyActive) {  // 43% BOMB CHANCE! (Massive increase)
+                    this.type = 'bomb';
+                    this.emoji = '💣';
+                }
+                else if (rand < 0.53 && !frenzyActive) {  // 8% TRAP CHANCE
+                    this.type = 'poison';
+                    this.emoji = '💔';
+                }
+                else if (rand < 0.63) {  // 10% POWERUPS
+                    let p = POWERUPS[Math.floor(Math.random() * POWERUPS.length)];
+                    this.type = 'powerup';
+                    this.subType = p.type;
+                    this.emoji = p.emoji;
+                    this.color = p.color;
+                }
+                else {
+                    this.type = 'normal';
+                    this.emoji = GOOD_ITEMS[Math.floor(Math.random() * GOOD_ITEMS.length)];
+                }
+
+                this.sliced = false;
+                this.nearMissed = false;
+                this.rotation = 0;
+                this.rotSpeed = (Math.random() - 0.5) * 0.1;
+
+                return this;
+            }
+
+            update() {
+                if (magnetActive && (this.type === 'normal' || this.type === 'powerup' || this.type === 'gift')) {
+                    this.x += (currentPointer.x - this.x) * 0.08;
+                    this.y += (currentPointer.y - this.y) * 0.08;
+                }
+
+                this.x += this.vx * gameSpeed;
+                this.y += this.vy * gameSpeed;
+
+                let gravity = slowGravityActive ? 0.08 : this.baseGravity;
+                if (this.type === 'boss') gravity = 0.15;
+
+                this.vy += gravity * gameSpeed;
+                this.rotation += this.rotSpeed * gameSpeed;
+
+                if (this.y > height + 100 && this.type === 'boss') {
+                    bossActive = false;
+                    nextBossScore += 1000;
+                }
+
+                if (this.y > height + 50 && !this.sliced && !this.penalized && !frenzyActive) {
+                    this.penalized = true;
+                    if (this.type === 'normal' || this.type === 'gift') {
+                        score -= 10;
+                        if (score < 0) score = 0;
+                        comboCount = 0;
+                        updateScore();
+                        showFloatingText("MISS -10", this.x, height - 60, false, "#ff3333");
+                    }
+                }
+            }
+
+            draw() {
+                if (this.sliced) return;
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                if (!isMobile) {
+                    if (this.type === 'bomb' || this.type === 'poison') {
+                        ctx.shadowBlur = 20; ctx.shadowColor = 'red';
+                    }
+                    else if (this.type === 'gift') {
+                        ctx.shadowBlur = 30; ctx.shadowColor = 'gold';
+                    }
+                    else if (this.type === 'boss') {
+                        ctx.shadowBlur = 40; ctx.shadowColor = '#ff007f';
+                    }
+                    else if (this.type === 'powerup') {
+                        ctx.shadowBlur = 25 + Math.sin(Date.now() * 0.01) * 10;
+                        ctx.shadowColor = this.color;
+                    }
+                }
+
+                ctx.font = `${this.radius * 1.5}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.emoji, 0, 0);
+
+                if (this.type === 'boss') {
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(-40, -60, 80, 10);
+                    ctx.fillStyle = '#00ff00';
+                    ctx.fillRect(-40, -60, (this.hp / 10) * 80, 10);
+                }
+
+                ctx.restore();
+            }
+        }
+
+        function checkSlices() {
+            if (trail.length < 2) return;
+
+            const last = trail[trail.length - 1];
+            const prev = trail[trail.length - 2];
+
+            let swipeSpeed = Math.hypot(last.x - prev.x, last.y - prev.y);
+            let isCritical = swipeSpeed > 35;
+            let cutInThisFrame = 0;
+
+            items.forEach(item => {
+                if (item.sliced) return;
+
+                let isHit = distToSegmentSquared({ x: item.x, y: item.y }, prev, last) <= item.radius * item.radius;
+
+                if (item.type === 'bomb' && !isHit && Math.hypot(item.x - last.x, item.y - last.y) < item.radius + 30 && !item.nearMissed) {
+                    item.nearMissed = true;
+                    showFloatingText("CLOSE!", item.x, item.y, false, "orange");
+                    score += 5;
+                    updateScore();
+                }
+
+                if (isHit) {
+
+                    if (item.type === 'boss') {
+                        item.hp--;
+                        sparks.push({ x: item.x, y: item.y, life: 10, maxLife: 10 });
+                        playSFX('sliceSound1');
+
+                        // Boss hit vibration
+                        if (navigator.vibrate) navigator.vibrate([50, 50]);
+
+                        if (item.hp <= 0) {
+                            item.sliced = true;
+                            bossActive = false;
+                            nextBossScore += 1000;
+                            score += 500;
+                            rings += 20;
+                            updateScore();
+                            updateLoveMeter(50);
+                            showFloatingText("BOSS DEFEATED! +500", item.x, item.y, true, "#ff00cc");
+
+                            for (let i = 0; i < 30; i++) {
+                                particles.push(new Particle(item.x, item.y, SAKURA_PARTICLES[Math.floor(Math.random() * SAKURA_PARTICLES.length)]));
+                            }
+                        } else {
+                            item.x += (Math.random() - 0.5) * 20;
+                        }
+                        return;
+                    }
+
+                    item.sliced = true;
+                    sparks.push({ x: item.x, y: item.y, life: 15, maxLife: 15 });
+
+                    if (item.type === 'poison') {
+                        playSFX('bombSound');
+                        score -= 50;
+                        if (score < 0) score = 0;
+                        comboCount = 0;
+                        updateScore();
+
+                        const flash = document.getElementById('flash');
+                        flash.className = 'flash red-flash active';
+                        setTimeout(() => flash.className = 'flash', 150);
+
+                        // Trap heavy vibration
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                        showFloatingText("OUCH! -50", item.x, item.y, true, "red");
+                        return;
+                    }
+
+                    if (item.type === 'bomb') {
+                        if (frenzyActive) return;
+
+                        playSFX('bombSound');
+                        lives--;
+                        updateLivesUI();
+
+                        // Bomb Heavy Vibration
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+                        const flash = document.getElementById('flash');
+                        flash.className = 'flash active';
+                        setTimeout(() => flash.className = 'flash', 150);
+
+                        if (lives <= 0) triggerGameOver();
+                        return;
+                    }
+
+                    // NEW: Random slice sound
+                    playRandomSliceSound();
+
+                    // NEW: Short dynamic vibration for slice
+                    if (navigator.vibrate) {
+                        isCritical ? navigator.vibrate([40, 20, 40]) : navigator.vibrate(30);
+                    }
+
+                    cutInThisFrame++;
+                    updateLoveMeter(5);
+
+                    if (particles.length < MAX_PARTICLES) {
+                        particles.push(new Particle(item.x - 20, item.y, item.emoji, true));
+                        particles.push(new Particle(item.x + 20, item.y, item.emoji, true));
+                        for (let i = 0; i < 4; i++) {
+                            particles.push(new Particle(item.x, item.y, SAKURA_PARTICLES[Math.floor(Math.random() * SAKURA_PARTICLES.length)]));
+                        }
+                    }
+
+                    if (item.type === 'gift') {
+                        rings += 50;
+                        showFloatingText("GIFT! +50 💍", item.x, item.y, true, "gold");
+                        updateLoveMeter(30);
+                    }
+                    else if (item.type === 'powerup') {
+                        activatePowerup(item.subType, item.x, item.y);
+                    }
+                    else {
+                        if (item.emoji === '💍') {
+                            rings++;
+                            localStorage.setItem("weddingNinjaRings", rings);
+                        }
+
+                        let points = 10 * scoreMultiplier * bladeLevel;
+                        if (isCritical) {
+                            points += 20 * scoreMultiplier;
+                            showFloatingText("CRITICAL!", item.x, item.y - 20, false, "#ff3333");
+                        }
+                        score += points;
+                        updateScore();
+                        showFloatingText(`+${points}`, item.x, item.y);
+                    }
+
+                    document.getElementById('ringDisplayText').innerText = rings;
+                }
+            });
+
+            if (cutInThisFrame > 0) {
+                comboCount += cutInThisFrame;
+                comboTimer = 60;
+
+                if (comboCount >= 3) {
+                    let bonus = comboCount * 10 * scoreMultiplier * bladeLevel;
+                    score += bonus;
+                    updateScore();
+                    showFloatingText(`COMBO x${comboCount}!`, last.x, last.y - 40, true);
+                    updateLoveMeter(10);
+
+                    // Combo Vibration
+                    if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                }
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('scoreDisplay').innerText = score;
+            if (score > bestScore) {
+                bestScore = score;
+                document.getElementById('highScoreDisplay').innerText = bestScore;
+                localStorage.setItem("weddingNinjaHighScore", bestScore);
+            }
+        }
+
+        function activatePowerup(type, x, y) {
+            if (type === 'freeze') {
+                showFloatingText("SLOW-MO!", x, y, true, '#00FFFF');
+                slowGravityActive = true;
+                gameSpeed = 0.5;
+                updatePowerupUI();
+
+                clearTimeout(freezeTimeout);
+                freezeTimeout = setTimeout(() => {
+                    slowGravityActive = false;
+                    gameSpeed = 1 + (difficultyTimer / 3000);
+                    updatePowerupUI();
+                }, 5000);
+            }
+            else if (type === 'double') {
+                showFloatingText("2x POINTS!", x, y, true, '#FFD700');
+                scoreMultiplier = 2;
+                updatePowerupUI();
+
+                clearTimeout(doubleTimeout);
+                doubleTimeout = setTimeout(() => {
+                    scoreMultiplier = 1;
+                    updatePowerupUI();
+                }, 5000);
+            }
+            else if (type === 'magnet') {
+                showFloatingText("MAGNET!", x, y, true, '#a855f7');
+                magnetActive = true;
+                updatePowerupUI();
+
+                clearTimeout(magnetTimeout);
+                magnetTimeout = setTimeout(() => {
+                    magnetActive = false;
+                    updatePowerupUI();
+                }, 5000);
+            }
+        }
+
+        function showFloatingText(txt, x, y, isCombo = false, color = null) {
+            const el = document.createElement('div');
+            el.innerText = txt;
+            el.className = `slash-text ${isCombo ? 'combo-text' : ''}`;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            if (color) el.style.color = color;
+
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        function triggerGameOver() {
+            isPlaying = false;
+            bossActive = false;
+            document.getElementById('bgmSound').pause();
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+
+            fetch(`${API_URL}/game/score`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: playerName, score: score })
+            }).catch(e => console.log("Score save failed offline"));
+        }
+
+        function gameLoop() {
+            if (paused) {
+                ctx.fillStyle = "rgba(0,0,0,0.5)";
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = "white";
+                ctx.font = "50px Bangers";
+                ctx.textAlign = "center";
+                ctx.fillText("PAUSED", width / 2, height / 2);
+                animationId = requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            if (!isPlaying) return;
+
+            ctx.clearRect(0, 0, width, height);
+            drawStars();
+
+            difficultyTimer++;
+
+            if (difficultyTimer % 300 === 0) {
+                spawnRate += 0.01;
+                if (gameSpeed < 3.2) gameSpeed += 0.1;
+            }
+
+            if (comboTimer > 0) comboTimer--; else comboCount = 0;
+
+            let currentSpawnRate = frenzyActive ? 0.25 : spawnRate;
+            if (items.length < MAX_ITEMS && Math.random() < currentSpawnRate) {
+                items.push(getItem());
+            }
+
+            items.forEach(item => {
+                item.update();
+                item.draw();
+            });
+
+            items = items.filter(i => {
+                if (i.y < height + 150 && !i.sliced) return true;
+                releaseItem(i);
+                return false;
+            });
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            particles = particles.filter(p => p.life > 0);
+
+            sparks.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 20 + (s.maxLife - s.life), 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${s.life / s.maxLife})`;
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                s.life--;
+            });
+            sparks = sparks.filter(s => s.life > 0);
+
+            if (trail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(trail[0].x, trail[0].y);
+
+                for (let i = 1; i < trail.length; i++) {
+                    let xc = (trail[i].x + trail[i - 1].x) / 2;
+                    let yc = (trail[i].y + trail[i - 1].y) / 2;
+                    ctx.quadraticCurveTo(trail[i - 1].x, trail[i - 1].y, xc, yc);
+                }
+
+                ctx.lineTo(trail[trail.length - 1].x, trail[trail.length - 1].y);
+
+                let gradient = ctx.createLinearGradient(0, 0, width, height);
+                gradient.addColorStop(0, frenzyActive ? "#ff8c00" : "#ff00cc");
+                gradient.addColorStop(1, frenzyActive ? "#ff0000" : "#3333ff");
+
+                ctx.lineWidth = 10 + (bladeLevel * 2);
+                ctx.strokeStyle = gradient;
+
+                if (!isMobile) {
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = frenzyActive ? "#ff8c00" : "#ff00cc";
+                }
+
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.stroke();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = "#FFFFFF";
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('playerName').value.trim();
+            if (!nameInput) return alert("Please enter your Ninja Name!");
+            playerName = nameInput;
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+
+            if (animationId) cancelAnimationFrame(animationId);
+
+            score = 0;
+            gameSpeed = 1;
+            spawnRate = 0.035;
+            lives = 3;
+            difficultyTimer = 0;
+            comboCount = 0;
+            loveMeter = 0;
+            bossActive = false;
+            nextBossScore = 1000;
+            frenzyActive = false;
+
+            clearTimeout(doubleTimeout);
+            clearTimeout(freezeTimeout);
+            clearTimeout(magnetTimeout);
+            scoreMultiplier = 1;
+            slowGravityActive = false;
+            magnetActive = false;
+            updatePowerupUI();
+
+            updateScore();
+            updateLivesUI();
+            document.getElementById('loveMeterFill').style.width = '0%';
+
+            items.forEach(i => releaseItem(i));
+            items = [];
+            particles = [];
+            sparks = [];
+            trail = [];
+
+            playBGM();
+            isPlaying = true;
+            paused = false;
+            resize();
+
+            gameLoop();
+        }
+
+        function resetToStart() {
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            loadLeaderboard();
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const res = await fetch(`${API_URL}/game/leaderboard`);
+                const data = await res.json();
+                const list = document.getElementById('leaderboardList');
+
+                if (data.length > 0) {
+                    list.innerHTML = data.map((p, i) => `
+                        <li class="flex justify-between items-center bg-white/10 p-2 rounded-lg border border-white/5 mb-1">
+                            <span class="text-white">#${i + 1} ${p.username}</span>
+                            <span class="text-pink-400">${p.score} pts</span>
+                        </li>
+                    `).join('');
+                } else {
+                    list.innerHTML = `<li class="text-center text-gray-400">Be the first Ninja!</li>`;
+                }
+            } catch (e) {
+                document.getElementById('leaderboardList').innerHTML = `<li class="text-center text-red-400">Server offline</li>`;
+            }
+        }
+
+        resize();
+        loadLeaderboard();
+    </script>
+</body>
+
+</html>

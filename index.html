@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chamara & Jinadhi | Wedding Invitation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#C5A059',
+                        bgMain: '#FDFBF7',
+                        textMain: '#2C2C2C',
+                        textSec: '#555555',
+                        paper: {
+                            light: '#EEDC9A',
+                            base: '#D4AF37',
+                            dark: '#B8962A',
+                            shadow: '#947820'
+                        },
+                        wax: {
+                            light: '#B38B4D',
+                            base: '#8A6327',
+                            dark: '#5C4015'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Lato"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FEF8E7;
+            color: var(--textMain);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- THE CUSTOM ENVELOPE PATTERN FROM YOUR LINK --- */
+        .pattern-envelope {
+            background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3mfC_BprV2nlIN0GVGXdYWK0nMxdoXN9fwQ&s");
+            background-size: 150px;
+            background-repeat: repeat;
+            background-blend-mode: multiply;
+        }
+
+        /* --- MAIN CONTAINER BACKGROUND WITH SUBTLE PATTERN --- */
+        .main-wrapper {
+            background-color: #FEF8E7;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-wrapper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3mfC_BprV2nlIN0GVGXdYWK0nMxdoXN9fwQ&s");
+            background-size: 200px;
+            background-repeat: repeat;
+            opacity: 0.18;
+            z-index: 0;
+        }
+
+        .main-wrapper>* {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- 3D ENVELOPE CSS --- */
+        .perspective-container {
+            perspective: 2500px;
+            transform-style: preserve-3d;
+            transform: rotateX(5deg) rotateY(-3deg);
+            transition: transform 0.8s ease-out;
+        }
+
+        .perspective-container.focus {
+            transform: rotateX(0deg) rotateY(0deg);
+        }
+
+        .envelope-body {
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.4),
+                inset 0 0 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .flap-top {
+            transform-origin: top;
+            transition: transform 1s cubic-bezier(0.25, 1, 0.5, 1), z-index 0s 0.3s;
+            transform-style: preserve-3d;
+        }
+
+        .flap-top.open {
+            transform: rotateX(175deg);
+            z-index: 5 !important;
+        }
+
+        .letter {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1), inset 0 0 20px rgba(0, 0, 0, 0.02);
+            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s;
+        }
+
+        .letter.pull {
+            transform: translateY(-160px) translateZ(20px) scale(1.05);
+            z-index: 40 !important;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .letter.pull {
+                transform: translateY(-130px) translateZ(20px) scale(1.05);
+            }
+        }
+
+        .overlay-zoom-out {
+            transform: scale(3.5) translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* --- ULTRA REALISTIC WAX SEAL CSS --- */
+        .organic-seal {
+            border-radius: 48% 52% 43% 57% / 54% 45% 55% 46%;
+            box-shadow:
+                0 8px 15px rgba(0, 0, 0, 0.4),
+                inset -3px -3px 8px rgba(0, 0, 0, 0.5),
+                inset 3px 3px 6px rgba(255, 255, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.2, -0.5, 0.8, 1);
+        }
+
+        .organic-seal-inner {
+            border-radius: 50% 48% 52% 49%;
+            box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.7), 0 1px 1px rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #A87D3A 0%, #6E4E1C 100%);
+        }
+
+        .stamped-text {
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2), -1px -1px 2px rgba(0, 0, 0, 0.8);
+            color: #E3C896;
+        }
+
+        .seal-broken {
+            transform: translateY(60px) rotate(20deg) scale(0.8) !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .crease-line {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 0%, transparent 100%);
+        }
+
+        /* --- MAIN CONTENT CSS --- */
+        #main-content {
+            background-color: var(--bgMain);
+        }
+
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Form styling */
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(197, 160, 89, 0.4);
+            border-radius: 6px;
+            background: #FFFFFF;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #C5A059;
+            box-shadow: 0 0 5px rgba(197, 160, 89, 0.2);
+        }
+
+        .time-box span {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2C2C2C;
+            display: block;
+        }
+
+        .time-box small {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #C5A059;
+        }
+
+        /* --- DYNAMIC ANIMATIONS (Rain & Typing) --- */
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes typing {
+            0% {
+                content: 'Typing.';
+            }
+
+            33% {
+                content: 'Typing..';
+            }
+
+            66% {
+                content: 'Typing...';
+            }
+
+            100% {
+                content: 'Typing.';
+            }
+        }
+
+        .typing-effect::after {
+            content: 'Typing.';
+            animation: typing 1s infinite;
+        }
+    </style>
+</head>
+
+<body class="w-full min-h-screen relative">
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_7c2b1c6d0b.mp3" type="audio/mpeg">
+    </audio>
+
+    <canvas id="fireworks-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[100]"></canvas>
+
+    <button onclick="document.getElementById('login-modal').classList.remove('hidden')"
+        class="fixed top-4 right-4 md:top-6 md:right-6 z-[105] bg-white/90 backdrop-blur border border-[#C5A059]/50 text-[#C5A059] px-6 py-2 rounded-full shadow-lg font-sans text-sm tracking-widest uppercase hover:bg-[#C5A059] hover:text-white transition-all duration-300">
+        Play Now
+    </button>
+
+    <div id="login-modal"
+        class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
+        <div
+            class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-[#C5A059]/30 text-center relative">
+            <button onclick="document.getElementById('login-modal').classList.add('hidden')"
+                class="absolute top-4 right-5 text-gray-400 hover:text-gray-800 text-2xl leading-none">&times;</button>
+            <h2 class="font-serif text-2xl text-[#C5A059] mb-2">Welcome</h2>
+            <p class="text-xs text-gray-500 mb-6">Enter your details to continue</p>
+            <input type="email" id="login-email" placeholder="Email Address"
+                class="w-full mb-4 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C5A059] transition">
+            <input type="text" id="login-user" placeholder="Username"
+                class="w-full mb-6 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C5A059] transition">
+            <button onclick="processLogin()"
+                class="w-full py-3 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#A88647] text-white font-semibold tracking-wide shadow-lg hover:scale-105 transition-all duration-300">Continue</button>
+        </div>
+    </div>
+
+
+
+
+    <div id="envelope-overlay"
+        class="fixed inset-0 z-50 flex flex-col items-center justify-center w-full h-full bg-[#FEF8E7] overflow-hidden">
+
+        <div class="absolute inset-0 opacity-[0.06] pointer-events-none"
+            style="background-image: url('https://www.transparenttextures.com/patterns/damask.png');"></div>
+
+        <div class="relative z-10 flex flex-col items-center mb-10 px-4 text-center">
+            <h1
+                class="font-serif text-3xl md:text-5xl text-[#C5A059] tracking-widest mb-6 uppercase drop-shadow-sm font-semibold">
+                Wedding Invitation
+            </h1>
+
+            <div
+                class="w-40 h-40 md:w-56 md:h-56 rounded-full p-2 border border-[#C5A059]/40 shadow-xl bg-white mb-2 relative">
+                <img src="intro.png" alt="Chamara & Jinadhi Illustration"
+                    class="w-full h-full object-cover rounded-full">
+            </div>
+        </div>
+
+        <div id="envelope-container"
+            class="perspective-container relative w-[340px] h-[230px] md:w-[480px] md:h-[320px] cursor-pointer group z-20 mt-4">
+
+            <div class="absolute inset-0 bg-[#f9f5ea] pattern-envelope envelope-body rounded-sm border border-black/10">
+            </div>
+
+            <div id="the-letter"
+                class="letter absolute inset-x-4 top-4 bottom-4 bg-[#FFFFFF] z-10 flex flex-col items-center justify-center rounded-sm border border-[#C5A059]/30">
+                <div class="absolute inset-2 border border-[#C5A059]/20"></div>
+                <span class="font-serif text-5xl md:text-6xl text-[#C5A059] mb-3 relative z-10">C & J</span>
+                <span
+                    class="font-sans text-[10px] md:text-xs tracking-[0.4em] text-textSec relative z-10 font-medium">WEDDING
+                    INVITATION</span>
+            </div>
+
+            <div class="absolute inset-0 bg-[#eadeb5] pattern-envelope z-20 drop-shadow-[4px_0_10px_rgba(0,0,0,0.15)]"
+                style="clip-path: polygon(0 0, 48% 50%, 0 100%); border-right: 1px solid rgba(255,255,255,0.2);"></div>
+
+            <div class="absolute inset-0 bg-[#eadeb5] pattern-envelope z-20 drop-shadow-[-4px_0_10px_rgba(0,0,0,0.15)]"
+                style="clip-path: polygon(100% 0, 52% 50%, 100% 100%); border-left: 1px solid rgba(255,255,255,0.2);">
+            </div>
+
+            <div class="absolute inset-0 bg-[#e3d19b] pattern-envelope z-20 drop-shadow-[0_-5px_12px_rgba(0,0,0,0.2)]"
+                style="clip-path: polygon(0 100%, 100% 100%, 50% 48%); border-top: 1px solid rgba(255,255,255,0.2);">
+            </div>
+
+            <div id="flap-top"
+                class="flap-top absolute inset-0 bg-[#f4ebd0] pattern-envelope z-30 drop-shadow-[0_8px_15px_rgba(0,0,0,0.25)]"
+                style="clip-path: polygon(0 0, 100% 0, 50% 55%); border-bottom: 1px solid rgba(255,255,255,0.5);">
+                <div class="crease-line absolute top-0 left-0 right-0 h-2 z-40"></div>
+            </div>
+
+            <div id="wax-seal"
+                class="organic-seal absolute left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 w-[80px] h-[80px] md:w-[100px] md:h-[100px] bg-wax-base flex items-center justify-center z-40 hover:brightness-110">
+                <div class="organic-seal-inner w-[75%] h-[75%] flex items-center justify-center">
+                    <span class="stamped-text font-serif text-3xl md:text-4xl tracking-widest italic pr-1">CJ</span>
+                </div>
+            </div>
+
+            <p id="hint-text"
+                class="absolute -bottom-14 left-1/2 -translate-x-1/2 text-[#C5A059] font-sans text-sm tracking-widest uppercase transition-opacity duration-300 drop-shadow-sm font-semibold">
+                Tap to Open
+            </p>
+        </div>
+    </div>
+
+    <main id="main-content"
+        class="opacity-0 hidden h-screen overflow-y-auto transition-opacity duration-[1.5s] w-full p-2 md:p-6">
+        <div
+            class="max-w-2xl mx-auto main-wrapper min-h-screen shadow-2xl py-16 px-6 md:px-12 flex flex-col items-center text-center border-double border-[8px] border-[#5C4015] rounded-sm z-10 relative overflow-hidden">
+
+            <div class="absolute inset-0 opacity-[0.06] pointer-events-none"
+                style="background-image: url('https://www.transparenttextures.com/patterns/damask.png');"></div>
+
+            <div class="fade-up w-full flex justify-center mb-10 pt-8">
+                <div
+                    class="relative w-52 h-52 md:w-64 md:h-64 rounded-full p-2 border border-[#C5A059]/40 shadow-xl bg-white">
+                    <img src="https://ih1.redbubble.net/image.5033151238.4203/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                        alt="Chamara & Jinadhi" class="w-full h-full object-cover rounded-full">
+                </div>
+            </div>
+
+            <div class="fade-up w-full">
+                <p class="font-sans text-[#C5A059] text-sm tracking-[0.3em] uppercase mb-6">
+                    We Joyfully Invite You for our wedding
+                </p>
+                <h1 class="font-serif text-5xl md:text-6xl text-[#2C2C2C] leading-tight mb-8">
+                    Chamara <br />
+                    <span class="text-[#C5A059] italic font-light text-4xl my-2 block">&</span>
+                    Jinadhi
+                </h1>
+            </div>
+
+            <div class="fade-up w-full mt-2 text-center text-[#444444] text-sm leading-relaxed">
+                <p class="font-serif text-lg text-[#2C2C2C] mb-2">Chamara</p>
+                <p>Son of <br>Mr. Manjula Gunarathna <br>& <br>Mrs. Sriyani Dhammika</p>
+
+                <div class="my-4 text-[#C5A059] text-xl">&</div>
+
+                <p class="font-serif text-lg text-[#2C2C2C] mb-2">Jinadhi</p>
+                <p>Daughter of <br>Mr. Dhammika Hindurangala <br>& <br>(Late Mrs. Disna Kanthi)</p>
+            </div>
+
+            <div class="fade-up event-details w-full border-t border-b border-[#C5A059]/30 py-8 my-8">
+                <p class="font-serif text-2xl font-semibold text-[#2C2C2C] mb-4">
+                    Wednesday, May 27, 2026
+                </p>
+                <p class="text-[#555555] text-lg mb-2">
+                    Poruwa Ceremony: <span class="font-semibold text-[#C5A059]">8:30 AM</span>
+                </p>
+                <p class="text-[#555555] text-lg mt-4 font-serif italic">
+                    Grand Divine Hotel & Banquets<br>Kosgama
+                </p>
+            </div>
+
+            <div class="fade-up w-full flex justify-center gap-4 md:gap-8 my-8 pb-8 border-b border-[#C5A059]/30">
+                <div class="time-box"><span id="days">00</span><small>Days</small></div>
+                <div class="time-box"><span id="hours">00</span><small>Hours</small></div>
+                <div class="time-box"><span id="mins">00</span><small>Mins</small></div>
+                <div class="time-box"><span id="secs">00</span><small>Secs</small></div>
+            </div>
+
+            <div class="fade-up w-full flex flex-col items-center gap-4 pb-8 border-b border-[#C5A059]/30">
+                <div
+                    class="w-16 h-16 bg-[#FEF8E7] rounded-full flex items-center justify-center border border-[#C5A059]/40 shadow-sm mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#C5A059]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <p class="text-[#555555] text-xl font-serif italic mb-2">Grand Divine Hotel & Banquets<br>Kosgama</p>
+
+                <a href="https://www.google.com/maps/search/?api=1&query=Grand+Divine+hotel+and+Banquets,+Kosgama"
+                    target="_blank"
+                    class="w-full max-w-sm py-4 bg-[#2C2C2C] text-white font-sans font-bold uppercase tracking-widest text-sm hover:bg-black transition-colors shadow-md rounded-lg mt-2">
+                    View Location on Map
+                </a>
+            </div>
+
+            <div
+                class="fade-up w-full max-w-md mx-auto mt-16 bg-white/80 backdrop-blur-lg p-8 rounded-2xl border border-[#C5A059]/20 shadow-xl">
+                <h3 class="font-serif text-3xl text-center text-[#C5A059] mb-6">RSVP</h3>
+                <p class="text-center text-gray-500 mb-6 text-sm">We’d love to celebrate with you 💛</p>
+
+                <input type="text" id="guestName" placeholder="Your Full Name"
+                    class="w-full mb-4 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C5A059] transition">
+                <input type="tel" id="guestPhone" placeholder="Mobile Number"
+                    class="w-full mb-4 px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C5A059] transition">
+
+                <select id="guestStatus"
+                    class="w-full mb-6 px-4 py-3 rounded-lg border border-gray-200 text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#C5A059] transition">
+                    <option value="" disabled selected>Will you be attending?</option>
+                    <option value="Attending">✨ Yes, I will attend</option>
+                    <option value="Not Attending">😔 Sorry, I can't attend</option>
+                </select>
+                <div id="form-alert" class="hidden mb-4 text-center py-3 rounded-lg font-semibold"></div>
+                <button id="rsvpBtn" onclick="submitRSVP()"
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-[#C5A059] to-[#A88647] text-white font-semibold tracking-wide shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    Confirm RSVP
+                </button>
+            </div>
+
+            <div
+                class="fade-up w-full max-w-md mx-auto mt-8 mb-8 bg-white/80 backdrop-blur-lg p-8 rounded-2xl border border-[#C5A059]/20 shadow-xl">
+                <h3 class="font-serif text-2xl text-center text-[#C5A059] mb-2">Fun & Games</h3>
+                <p class="text-center text-gray-500 mb-6 text-sm">Play a quick game while you wait for the big day!</p>
+                <a href="game.html"
+                    class="block text-center w-full py-4 rounded-xl bg-[#2C2C2C] text-white font-semibold tracking-wide shadow-lg hover:bg-black hover:scale-105 transition-all duration-300">
+                    Play Now
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- NEW LOGIN/ROUTING LOGIC ---
+        function processLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const user = document.getElementById('login-user').value.trim();
+
+            if (email === 'chamarajinadhi@gmail.com' && user === 'chamarajinadhi') {
+                window.location.href = "dashboard.html"; // ✅ go dashboard
+            } else {
+                window.location.href = "game.html"; // ❌ go game
+            }
+        }
+
+        // --- FIREWORKS SYSTEM ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+        let fireworksActive = false;
+
+        function createExplosion(x, y) {
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
+                    life: 1,
+                    color: `hsl(${Math.random() * 60 + 30}, 100%, 60%)`
+                });
+            }
+        }
+
+        function animateFireworks() {
+            if (!fireworksActive && particles.length === 0) return;
+            requestAnimationFrame(animateFireworks);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15;
+                p.life -= 0.02;
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.life <= 0) particles.splice(i, 1);
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        // --- MAIN LOAD ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.getElementById('envelope-container');
+            const waxSeal = document.getElementById('wax-seal');
+            const flapTop = document.getElementById('flap-top');
+            const letter = document.getElementById('the-letter');
+            const overlay = document.getElementById('envelope-overlay');
+            const mainContent = document.getElementById('main-content');
+            const hintText = document.getElementById('hint-text');
+            const bgMusic = document.getElementById('bg-music');
+
+            // --- ENVELOPE ANIMATION ---
+            container.addEventListener('click', () => {
+                container.classList.add('focus');
+                hintText.style.opacity = '0';
+
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 200]);
+                }
+
+                startMusic();
+
+                setTimeout(() => { waxSeal.classList.add('seal-broken'); }, 200);
+                setTimeout(() => { flapTop.classList.add('open'); }, 500);
+
+                setTimeout(() => {
+                    letter.classList.add('pull');
+                    fireworksActive = true;
+                    animateFireworks();
+                    createExplosion(window.innerWidth * 0.3, window.innerHeight * 0.3);
+                    setTimeout(() => createExplosion(window.innerWidth * 0.7, window.innerHeight * 0.4), 400);
+                    setTimeout(() => createExplosion(window.innerWidth * 0.5, window.innerHeight * 0.2), 800);
+                }, 1300);
+
+                setTimeout(() => {
+                    overlay.classList.add('overlay-zoom-out');
+                    mainContent.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        mainContent.classList.remove('opacity-0');
+                        triggerScrollReveal();
+                        setTimeout(() => fireworksActive = false, 3000);
+                    }, 50);
+                }, 2600);
+
+                setTimeout(() => { overlay.remove(); }, 4000);
+            }, { once: true });
+
+            // --- SCROLL REVEAL ---
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            function triggerScrollReveal() {
+                const elements = document.querySelectorAll('.fade-up');
+                elements.forEach((el, index) => {
+                    setTimeout(() => {
+                        observer.observe(el);
+                        el.classList.add('visible');
+                    }, index * 200);
+                });
+            }
+
+            // --- COUNTDOWN TIMER ---
+            const eventDate = new Date("May 27, 2026 08:30:00").getTime();
+            const timerInterval = setInterval(function () {
+                const now = new Date().getTime();
+                const distance = eventDate - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("days").innerText = "00";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = days.toString().padStart(2, '0');
+                document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+                document.getElementById("mins").innerText = minutes.toString().padStart(2, '0');
+                document.getElementById("secs").innerText = seconds.toString().padStart(2, '0');
+            }, 1000);
+        });
+
+        // --- EMOJI RAIN ---
+        function createEmojiRain(type) {
+            const emojis = type === "happy"
+                ? ["🎉", "💖", "✨", "🥂", "🌸"]
+                : ["😢", "💔", "🥀", "💭"];
+
+            for (let i = 0; i < 30; i++) {
+                const span = document.createElement("div");
+                span.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                span.style.position = "fixed";
+                span.style.left = Math.random() * 100 + "vw";
+                span.style.top = "-50px";
+                span.style.fontSize = "24px";
+                span.style.zIndex = "9999";
+                span.style.pointerEvents = "none";
+                span.style.animation = `fall ${2 + Math.random() * 3}s linear`;
+                document.body.appendChild(span);
+                setTimeout(() => span.remove(), 4000);
+            }
+        }
+
+        // --- RSVP WHATSAPP LOGIC ---
+        function submitRSVP() {
+            const name = document.getElementById('guestName').value.trim();
+            const phone = document.getElementById('guestPhone').value.trim();
+            const status = document.getElementById('guestStatus').value;
+
+            const alertBox = document.getElementById('form-alert');
+
+            if (name === "" || phone === "" || status === "") {
+                alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-red-100 text-red-600";
+                alertBox.innerText = "❌ Please fill all details!";
+                alertBox.classList.remove("hidden");
+                return;
+            }
+
+            fetch("http://localhost:3000/api/rsvp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    phone,
+                    status,
+                    date: "2026-05-27"
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-green-100 text-green-700";
+                    alertBox.innerText = "✅ Successfully Submitted!";
+                    alertBox.classList.remove("hidden");
+
+                    document.getElementById('guestName').value = "";
+                    document.getElementById('guestPhone').value = "";
+                    document.getElementById('guestStatus').value = "";
+
+                    createEmojiRain("happy");
+                })
+                .catch(err => {
+                    alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-red-100 text-red-600";
+                    alertBox.innerText = "❌ Server Error!";
+                    alertBox.classList.remove("hidden");
+                    console.log(err);
+                });
+        }
+        function startMusic() {
+            const bgMusic = document.getElementById('bg-music');
+            bgMusic.volume = 0.5;
+
+            const playPromise = bgMusic.play();
+
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log("🎵 Music playing");
+                    })
+                    .catch(() => {
+                        console.log("Autoplay blocked - waiting click");
+
+                        // fallback: play on first user click
+                        document.body.addEventListener("click", () => {
+                            bgMusic.play();
+                        }, { once: true });
+                    });
+            }
+        }
+    </script>
+</body>
+
+</html>
