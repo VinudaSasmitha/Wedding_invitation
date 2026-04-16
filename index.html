@@ -217,6 +217,13 @@
             color: #C5A059;
         }
 
+        .hero-names {
+            background: linear-gradient(120deg, #C5A059, #EEDC9A, #B8962A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(197, 160, 89, 0.3);
+        }
+
         /* --- DYNAMIC ANIMATIONS (Rain & Typing) --- */
         @keyframes fall {
             to {
@@ -253,9 +260,8 @@
 <body class="w-full min-h-screen relative">
 
     <audio id="bg-music" loop preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_7c2b1c6d0b.mp3" type="audio/mpeg">
+        <source src="music.mp3" type="audio/mpeg">
     </audio>
-
     <canvas id="fireworks-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
 
@@ -361,26 +367,48 @@
                 </div>
             </div>
 
-            <div class="fade-up w-full">
-                <p class="font-sans text-[#C5A059] text-sm tracking-[0.3em] uppercase mb-6">
-                    We Joyfully Invite You for our wedding
-                </p>
-                <h1 class="font-serif text-5xl md:text-6xl text-[#2C2C2C] leading-tight mb-8">
-                    Chamara <br />
-                    <span class="text-[#C5A059] italic font-light text-4xl my-2 block">&</span>
+            <div class="fade-up mt-6 text-center">
+
+                <h1 class="font-serif text-4xl md:text-6xl text-[#2C2C2C] tracking-wide leading-tight">
+                    Chamara
+                </h1>
+
+                <div class="flex items-center justify-center my-3">
+                    <div class="w-10 h-[1px] bg-[#C5A059]"></div>
+                    <span class="mx-3 text-[#C5A059] text-xl font-serif">&</span>
+                    <div class="w-10 h-[1px] bg-[#C5A059]"></div>
+                </div>
+
+                <h1 class="font-serif text-4xl md:text-6xl text-[#2C2C2C] tracking-wide leading-tight">
                     Jinadhi
                 </h1>
+
             </div>
 
-            <div class="fade-up w-full mt-2 text-center text-[#444444] text-sm leading-relaxed">
-                <p class="font-serif text-lg text-[#2C2C2C] mb-2">Chamara</p>
-                <p>Son of <br>Mr. Manjula Gunarathna <br>& <br>Mrs. Sriyani Dhammika</p>
+            <div class="fade-up w-full mt-6 text-center text-[#444444] text-sm leading-relaxed">
 
-                <div class="my-4 text-[#C5A059] text-xl">&</div>
+                <p class="uppercase tracking-[0.3em] text-[#C5A059] text-xs mb-6">
+                    With the blessings of their loving families
+                </p>
 
-                <p class="font-serif text-lg text-[#2C2C2C] mb-2">Jinadhi</p>
-                <p>Daughter of <br>Mr. Dhammika Hindurangala <br>& <br>(Late Mrs. Disna Kanthi)</p>
+                <p class="font-serif text-base md:text-lg leading-relaxed text-[#2C2C2C] px-2">
+                    Born and raised with love and guidance,<br>
+                    <span class="font-semibold">Chamara</span>, beloved son of<br>
+                    Mr. Manjula Gunarathna & Mrs. Sriyani Dhammika,<br><br>
+
+                    and<br><br>
+
+                    <span class="font-semibold">Jinadhi</span>, cherished daughter of<br>
+                    Mr. Dhammika Hindurangala<br>
+                    <span class="text-sm text-gray-500">(Late Mrs. Disna Kanthi)</span><br><br>
+
+                <p class="font-serif italic text-[#C5A059] mt-4 text-lg">
+                    A new chapter begins...
+                </p>
+                </p>
+
             </div>
+
 
             <div class="fade-up event-details w-full border-t border-b border-[#C5A059]/30 py-8 my-8">
                 <p class="font-serif text-2xl font-semibold text-[#2C2C2C] mb-4">
@@ -684,24 +712,21 @@
         }
         function startMusic() {
             const bgMusic = document.getElementById('bg-music');
-            bgMusic.volume = 0.5;
 
-            const playPromise = bgMusic.play();
-
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        console.log("🎵 Music playing");
-                    })
-                    .catch(() => {
-                        console.log("Autoplay blocked - waiting click");
-
-                        // fallback: play on first user click
-                        document.body.addEventListener("click", () => {
-                            bgMusic.play();
-                        }, { once: true });
-                    });
-            }
+            bgMusic.muted = true;
+            bgMusic.play().then(() => {
+                // after play, unmute
+                setTimeout(() => {
+                    bgMusic.muted = false;
+                    bgMusic.volume = 0.5;
+                }, 500);
+            }).catch(() => {
+                // fallback click
+                document.body.addEventListener("click", () => {
+                    bgMusic.muted = false;
+                    bgMusic.play();
+                }, { once: true });
+            });
         }
     </script>
 </body>
