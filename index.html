@@ -258,10 +258,7 @@
 
     <canvas id="fireworks-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
-    <button onclick="document.getElementById('login-modal').classList.remove('hidden')"
-        class="fixed top-4 right-4 md:top-6 md:right-6 z-[105] bg-white/90 backdrop-blur border border-[#C5A059]/50 text-[#C5A059] px-6 py-2 rounded-full shadow-lg font-sans text-sm tracking-widest uppercase hover:bg-[#C5A059] hover:text-white transition-all duration-300">
-        Play Now
-    </button>
+
 
     <div id="login-modal"
         class="hidden fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
@@ -447,15 +444,7 @@
                 </button>
             </div>
 
-            <div
-                class="fade-up w-full max-w-md mx-auto mt-8 mb-8 bg-white/80 backdrop-blur-lg p-8 rounded-2xl border border-[#C5A059]/20 shadow-xl">
-                <h3 class="font-serif text-2xl text-center text-[#C5A059] mb-2">Fun & Games</h3>
-                <p class="text-center text-gray-500 mb-6 text-sm">Play a quick game while you wait for the big day!</p>
-                <a href="game.html"
-                    class="block text-center w-full py-4 rounded-xl bg-[#2C2C2C] text-white font-semibold tracking-wide shadow-lg hover:bg-black hover:scale-105 transition-all duration-300">
-                    Play Now
-                </a>
-            </div>
+
 
         </div>
     </main>
@@ -626,6 +615,7 @@
         }
 
         // --- RSVP WHATSAPP LOGIC ---
+        // --- RSVP WHATSAPP LOGIC ---
         function submitRSVP() {
             const name = document.getElementById('guestName').value.trim();
             const phone = document.getElementById('guestPhone').value.trim();
@@ -640,36 +630,40 @@
                 return;
             }
 
-            fetch("http://localhost:3000/api/rsvp", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    name,
-                    phone,
-                    status,
-                    date: "2026-05-27"
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-green-100 text-green-700";
-                    alertBox.innerText = "✅ Successfully Submitted!";
-                    alertBox.classList.remove("hidden");
+            // WhatsApp Message එක හදන විදිය (එනවා නම් සහ එන්නේ නැත්තම්)
+            let message = "";
+            if (status === "Attending") {
+                message = `Hi Chamara & Jinadhi! ✨\n\nI am ${name} (${phone}).\nI'm delighted to let you know that I WILL BE ATTENDING your wedding!\n\nWishing you both a very Happy Wedded Life! 🥂🎉`;
+            } else {
+                message = `Hi Chamara & Jinadhi! 🌸\n\nI am ${name} (${phone}).\nUnfortunately, I WON'T BE ABLE TO ATTEND your wedding.\n\nWishing you both a beautiful day and a very Happy Wedded Life! 💖`;
+            }
 
-                    document.getElementById('guestName').value = "";
-                    document.getElementById('guestPhone').value = "";
-                    document.getElementById('guestStatus').value = "";
+            // Message එක URL format එකට හරවනවා
+            const encodedMessage = encodeURIComponent(message);
 
-                    createEmojiRain("happy");
-                })
-                .catch(err => {
-                    alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-red-100 text-red-600";
-                    alertBox.innerText = "❌ Server Error!";
-                    alertBox.classList.remove("hidden");
-                    console.log(err);
-                });
+            // ලංකාවේ WhatsApp number format එක (0 වෙනුවට 94)
+            const whatsappNumber = "94764121688";
+            const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+            // WhatsApp Web හෝ App එක open කිරීම
+            window.open(whatsappURL, '_blank');
+
+            // UI එක update කිරීම
+            alertBox.className = "mb-4 text-center py-3 rounded-lg font-semibold bg-green-100 text-green-700";
+            alertBox.innerText = "✅ Opening WhatsApp...";
+            alertBox.classList.remove("hidden");
+
+            // Form එක clear කිරීම
+            document.getElementById('guestName').value = "";
+            document.getElementById('guestPhone').value = "";
+            document.getElementById('guestStatus').value = "";
+
+            // එන අයට happy emojis, එන්නේ නැති අයට sad emojis වැටෙන්න
+            if (status === "Attending") {
+                createEmojiRain("happy");
+            } else {
+                createEmojiRain("sad");
+            }
         }
         function startMusic() {
             const bgMusic = document.getElementById('bg-music');
